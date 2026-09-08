@@ -1,22 +1,37 @@
-// Shared behaviour: mobile navigation, dynamic year and local contact-form demo.
+// Progressive enhancement: navigation and the year work without a framework.
 document.documentElement.classList.add("js");
 
 const menuButton = document.querySelector(".menu-toggle");
 const siteHeader = document.querySelector(".site-header");
+const navigation = document.querySelector("#main-navigation");
 
-if (menuButton && siteHeader) {
+if (menuButton && siteHeader && navigation) {
+  const setMenuOpen = (open, restoreFocus = false) => {
+    siteHeader.classList.toggle("menu-open", open);
+    menuButton.setAttribute("aria-expanded", String(open));
+    menuButton.textContent = open ? "Sluiten" : "Menu";
+    if (restoreFocus) menuButton.focus();
+  };
   menuButton.addEventListener("click", () => {
-    const isOpen = siteHeader.classList.toggle("menu-open");
-    menuButton.setAttribute("aria-expanded", String(isOpen));
-    menuButton.textContent = isOpen ? "Sluiten" : "Menu";
+    setMenuOpen(menuButton.getAttribute("aria-expanded") !== "true");
   });
-
-  document.querySelectorAll(".nav-links a").forEach((link) => {
-    link.addEventListener("click", () => {
-      siteHeader.classList.remove("menu-open");
-      menuButton.setAttribute("aria-expanded", "false");
-      menuButton.textContent = "Menu";
-    });
+  navigation.querySelectorAll("a").forEach((link) => {
+    link.addEventListener("click", () => setMenuOpen(false));
+  });
+  document.addEventListener("keydown", (event) => {
+    if (event.key === "Escape" && menuButton.getAttribute("aria-expanded") === "true") {
+      setMenuOpen(false, true);
+    }
+  });
+  // A disclosure, not a modal: tabbing onward closes the menu naturally.
+  siteHeader.addEventListener("focusout", (event) => {
+    if (!siteHeader.contains(event.relatedTarget)) setMenuOpen(false);
+  });
+  document.addEventListener("click", (event) => {
+    if (!siteHeader.contains(event.target)) setMenuOpen(false);
+  });
+  window.matchMedia("(min-width: 761px)").addEventListener("change", (event) => {
+    if (event.matches) setMenuOpen(false);
   });
 }
 
@@ -25,18 +40,24 @@ document.querySelectorAll("[data-current-year]").forEach((element) => {
 });
 
 const contactForm = document.querySelector("#contact-form");
-const formStatus = document.querySelector("#form-status");
-
-if (contactForm && formStatus) {
-  contactForm.addEventListener("submit", (event) => {
-    event.preventDefault();
-    if (!contactForm.checkValidity()) {
-      contactForm.reportValidity();
-      return;
-    }
-
-    // TODO: koppel dit formulier later aan een n8n webhook
-    formStatus.classList.add("is-visible");
-    contactForm.reset();
+if (contactForm) {
+  // No endpoint is configured. Never imply delivery, reset input or send a request.
+  contactForm.addEventListener("submit", (event) => event.preventDefault());
+  contactForm.querySelectorAll("[required]").forEach((field) => {
+    const error = document.getElementById(`${field.id}-error`);
+    if (!error) return;
+    const showValidation = () => {
+      const invalid = !field.validity.valid;
+      field.setAttribute("aria-invalid", String(invalid));
+      error.textContent = invalid
+        ? (field.validity.typeMismatch ? "Vul een geldig e-mailadres in." : "Vul dit veld in.")
+        : "";
+      error.hidden = !invalid;
+    };
+    field.addEventListener("blur", showValidation);
+    field.addEventListener("invalid", showValidation);
+    field.addEventListener("input", () => {
+      if (field.getAttribute("aria-invalid") === "true") showValidation();
+    });
   });
 }
