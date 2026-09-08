@@ -3,29 +3,32 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Bespreek met Nuvoro Automation welke processen binnen jouw organisatie slimmer, sneller of eenvoudiger kunnen.">
-  <title>Nuvoro Automation</title>
+  <meta name="description" content="Start de Process Scan of neem algemeen contact op met Nuvoro Automation.">
+  <title>Contact | Nuvoro Automation</title>
   <link rel="stylesheet" href="css/style.css">
   <script src="js/main.js" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#main-content">Direct naar inhoud</a>
-  <header class="site-header"><div class="container nav-wrap"><a class="brand" href="index.html" aria-label="Nuvoro Automation, home">Nuvoro <span>Automation</span></a><button class="menu-toggle" type="button" aria-expanded="false" aria-controls="main-navigation">Menu</button><nav id="main-navigation" aria-label="Hoofdnavigatie"><ul class="nav-links"><li><a href="index.html">Home</a></li><li><a href="over-ons.html">Over ons</a></li><li><a class="nav-contact" href="contact.html" aria-current="page">Bespreek je proces <span aria-hidden="true">↗</span></a></li></ul></nav></div></header>
+  <header class="site-header"><div class="container nav-wrap"><a class="brand" href="index.html" aria-label="Nuvoro Automation, home"><span class="brand-mark" aria-hidden="true">N</span><span>Nuvoro <b>Automation</b></span></a><button class="menu-toggle" type="button" aria-expanded="false" aria-controls="main-navigation">Menu</button><nav id="main-navigation" aria-label="Hoofdnavigatie"><ul class="nav-links"><li><a href="index.html">Home</a></li><li><a href="over-ons.html">Over ons</a></li><li><a href="process-scan.html">Process Scan</a></li><li><a class="nav-contact" href="contact.html" aria-current="page">Contact <span aria-hidden="true">↗</span></a></li></ul></nav></div></header>
+
   <main id="main-content">
-    <section class="section section-contact" aria-labelledby="contact-title"><div class="container contact-layout">
-      <div class="contact-details"><p class="eyebrow">Contact</p><h1 id="contact-title">Laten we kijken<br><span>wat er slimmer kan.</span></h1><p class="lead">Kost een proces veel tijd of bestaat het uit terugkerende handelingen? Vertel waar je tegenaan loopt. We denken graag vrijblijvend mee.</p><p class="contact-hint">Je hoeft nog geen oplossing te hebben.<br>We beginnen bij het proces.</p></div>
-      <!-- Nog geen bevestigde verzendendpoint: ook zonder JavaScript is de knop uitgeschakeld. -->
-      <form id="contact-form" class="form-card" method="post" aria-labelledby="form-title" aria-describedby="form-status">
-        <h2 id="form-title">Vertel over je proces</h2><p class="form-intro">Alle velden zijn verplicht, behalve je telefoonnummer.</p>
-        <p id="form-status" class="form-status" role="status">Verzenden via dit formulier is nog niet beschikbaar. Je gegevens worden niet verstuurd.</p>
+    <section class="section-contact"><div class="container contact-layout">
+      <div class="contact-details" data-reveal><p class="eyebrow"><span class="signal" aria-hidden="true"></span> Contact</p><h1>Begin bij het proces.</h1><p class="lead">Wil je een concreet proces bespreken? De Process Scan helpt je de situatie vooraf helder vast te leggen. Voor een algemene vraag kun je het contactformulier gebruiken zodra de verzendkoppeling actief is.</p>
+        <div class="contact-route contact-route-primary"><span class="status-badge status-connected">Aanbevolen route</span><h2>Doe de Process Scan</h2><p>Vier korte stappen, één controleerbare samenvatting en geen automatische score of besparingsclaim.</p><a class="button" href="process-scan.html">Start de Process Scan <span aria-hidden="true">↗</span></a></div>
+      </div>
+      <form id="contact-form" class="form-card" method="post" aria-labelledby="form-title" aria-describedby="form-status" data-reveal>
+        <p class="micro-label">Algemeen bericht</p><h2 id="form-title">Stuur een algemene vraag</h2><p class="form-intro">Alle velden zijn verplicht, behalve je telefoonnummer.</p>
+        <p id="form-status" class="form-status" role="status">De algemene verzendkoppeling is nog niet geconfigureerd. Je gegevens worden niet verstuurd.</p>
         <div class="form-row"><div class="form-field"><label for="name">Naam</label><input id="name" name="name" type="text" autocomplete="name" required aria-describedby="name-error"><p class="field-error" id="name-error" hidden></p></div><div class="form-field"><label for="company">Bedrijfsnaam</label><input id="company" name="company" type="text" autocomplete="organization" required aria-describedby="company-error"><p class="field-error" id="company-error" hidden></p></div></div>
         <div class="form-field"><label for="email">Zakelijk e-mailadres</label><input id="email" name="email" type="email" autocomplete="email" required aria-describedby="email-error"><p class="field-error" id="email-error" hidden></p></div>
         <div class="form-field"><label for="phone">Telefoonnummer <span class="optional">(optioneel)</span></label><input id="phone" name="phone" type="tel" autocomplete="tel"></div>
-        <div class="form-field"><label for="message">Bericht</label><p class="field-hint" id="message-hint">Welk werk wil je eenvoudiger maken?</p><textarea id="message" name="message" required aria-describedby="message-hint message-error"></textarea><p class="field-error" id="message-error" hidden></p></div>
+        <div class="form-field"><label for="message">Bericht</label><p class="field-hint" id="message-hint">Waar kunnen we je mee helpen?</p><textarea id="message" name="message" required aria-describedby="message-hint message-error"></textarea><p class="field-error" id="message-error" hidden></p></div>
         <button class="button" type="submit" disabled aria-describedby="form-status">Verstuur bericht <span aria-hidden="true">↗</span></button>
       </form>
     </div></section>
   </main>
-  <footer class="site-footer"><div class="container"><div class="footer-grid"><div><a class="brand" href="index.html">Nuvoro <span>Automation</span></a><p class="footer-tagline">Eerst het proces. Dan de technologie.</p></div><nav class="footer-nav" aria-label="Footer-navigatie"><a href="index.html">Home</a><a href="over-ons.html">Over ons</a><a href="contact.html">Contact</a></nav></div><p class="copyright">© <span data-current-year>2026</span> Nuvoro Automation</p></div></footer>
+
+  <footer class="site-footer"><div class="container"><div class="footer-grid"><div><a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true">N</span><span>Nuvoro <b>Automation</b></span></a><p class="footer-tagline">Eerst het proces. Dan de technologie.</p></div><nav class="footer-nav" aria-label="Footer-navigatie"><a href="index.html">Home</a><a href="over-ons.html">Over ons</a><a href="process-scan.html">Process Scan</a><a href="contact.html">Contact</a></nav></div><p class="copyright">© <span data-current-year>2026</span> Nuvoro Automation</p></div></footer>
 </body>
 </html>
