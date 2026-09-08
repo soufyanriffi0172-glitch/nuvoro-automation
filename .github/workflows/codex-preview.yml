@@ -1,0 +1,91 @@
+name: Codex preview branch
+
+on:
+  workflow_dispatch:
+    inputs:
+      task:
+        description: "De door de eigenaar goedgekeurde code-opdracht"
+        required: true
+        type: string
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  create-preview-branch:
+    if: github.actor == github.repository_owner
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+
+    env:
+      BRANCH_NAME: automation/preview-${{ github.run_id }}
+
+    steps:
+      - name: Haal de websitecode op
+        uses: actions/checkout@v5
+        with:
+          ref: main
+          fetch-depth: 0
+          persist-credentials: false
+
+      - name: Laat Codex een conceptwijziging maken
+        id: codex
+        uses: openai/codex-action@v1
+        with:
+          openai-api-key: ${{ secrets.OPENAI_API_KEY }}
+          model: gpt-5.6-terra
+          permission-profile: ":workspace"
+          safety-strategy: drop-sudo
+          prompt: |
+            Je voert uitsluitend een door de eigenaar goedgekeurde websitewijziging uit.
+
+            DE GOEDGEKEURDE OPDRACHT:
+            ---
+            ${{ inputs.task }}
+            ---
+
+            REGELS:
+            - Pas alleen aan wat in de opdracht staat.
+            - Behoud bestaande stijl, kleuren, lay-out en overige inhoud tenzij de opdracht expliciet iets anders zegt.
+            - Voeg geen klantnamen, cijfers, resultaten of onbewezen claims toe.
+            - Voeg geen dependencies, frameworks of externe libraries toe.
+            - Wijzig nooit bestanden in .github.
+            - Wijzig geen secrets, workflows, toegangsrechten of instellingen.
+            - Maak geen commit en push niets zelf.
+            - Controleer je wijziging lokaal waar dat veilig mogelijk is.
+            - Als de opdracht onduidelijk of strijdig is, maak dan geen wijziging en leg in je eindantwoord kort uit waarom.
+
+      - name: Controleer of er een wijziging is
+        id: changes
+        run: |
+          if git diff --quiet; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Maak een aparte preview-branch
+        if: steps.changes.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          git config user.name "Nuvoro Codex Runner"
+          git config user.email "noreply@github.com"
+          git switch -c "$BRANCH_NAME"
+          git add --all
+          git commit -m "Concept websitewijziging via Codex"
+          git push "https://x-access-token:${GH_TOKEN}@github.com/${{ github.repository }}.git" "$BRANCH_NAME"
+
+      - name: Maak een Pull Request voor review
+        id: pull_request
+        if: steps.changes.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          PR_URL=$(gh pr create \
+            --base main \
+            --head "$BRANCH_NAME" \
+            --title "Concept websitewijziging via Codex" \
+            --body "Deze wijziging is gemaakt op basis van een expliciet goedgekeurde opdracht. Controleer eerst de preview voordat je samenvoegt.")
+          echo "url=$PR_URL" >> "$GITHUB_OUTPUT"
