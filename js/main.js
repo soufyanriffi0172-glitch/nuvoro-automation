@@ -203,3 +203,43 @@ if (processScanForm) {
     }
   });
 }
+
+
+// Process Scan: n8n-intake gevolgd door een ingesloten Cal.com-afspraakplanner.
+(() => {
+  const form = document.querySelector('#process-scan-form');
+  if (!form) return;
+  const endpoint = 'https://soufyanriffi.app.n8n.cloud/webhook/nuvoro-process-scan';
+  const calLink = 'soufyan-riffi-ptzlxn/procesgesprek';
+  const button = form.querySelector('[data-booking-button]');
+  const status = form.querySelector('[data-booking-status]');
+  button.disabled = false;
+  status.textContent = 'Na verzending ga je direct door naar de beschikbare afspraakmomenten.';
+  const loadCal = () => new Promise((resolve) => {
+    if (!window.Cal) {
+      window.Cal = window.Cal || function () {
+        const c = window.Cal; const a = arguments;
+        if (!c.loaded) { c.ns = {}; c.q = c.q || []; document.head.appendChild(document.createElement('script')).src = 'https://app.cal.com/embed/embed.js'; c.loaded = true; }
+        if (a[0] === 'init') { const n = a[1]; const api = function () { api.q.push(arguments); }; api.q = []; c.ns[n] = c.ns[n] || api; c.ns[n].q.push(a); c.q.push(['initNamespace', n]); return; }
+        c.q.push(a);
+      };
+    }
+    window.Cal('init', 'nuvoro', { origin: 'https://app.cal.com' });
+    setTimeout(() => resolve(window.Cal.ns.nuvoro), 0);
+  });
+  form.addEventListener('submit', async () => {
+    const data = new FormData(form);
+    const scanId = crypto.randomUUID ? crypto.randomUUID() : String(Date.now());
+    const intake = { name: data.get('name'), company: data.get('company'), email: data.get('email'), phone: data.get('phone'), problem: data.get('problem'), currentProcess: data.get('currentProcess'), hoursPerWeek: data.get('hoursPerWeek'), category: data.get('category'), painPoints: data.getAll('painPoints'), systems: data.get('systems'), scanId, website: '' };
+    button.disabled = true; status.textContent = 'Je Process Snapshot wordt veilig klaargezet voor de afspraak…';
+    try {
+      const response = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(intake) });
+      if (!response.ok) throw new Error('intake');
+      let panel = document.querySelector('#cal-booking');
+      if (!panel) { panel = document.createElement('div'); panel.id = 'cal-booking'; panel.style.cssText = 'min-height:36rem;margin-top:1.5rem;border:1px solid #d5dfed;border-radius:14px;overflow:hidden;background:#fff'; form.querySelector('.booking-panel').after(panel); }
+      button.hidden = true; status.textContent = 'Kies hieronder een moment voor je procesgesprek.';
+      const Cal = await loadCal();
+      Cal('inline', { elementOrSelector: '#cal-booking', calLink, config: { name: intake.name, email: intake.email, 'metadata[scanId]': scanId, 'metadata[company]': intake.company || '', 'metadata[phone]': intake.phone || '', 'metadata[problem]': String(intake.problem || '').slice(0, 480), 'metadata[currentProcess]': String(intake.currentProcess || '').slice(0, 480), 'metadata[hoursPerWeek]': intake.hoursPerWeek || '', 'metadata[category]': intake.category || '', 'metadata[painPoints]': intake.painPoints.join(' · '), 'metadata[systems]': intake.systems || '' } });
+    } catch { button.disabled = false; status.textContent = 'Verzenden is niet gelukt. Je invoer blijft op deze pagina; probeer het later opnieuw.'; }
+  });
+})();
