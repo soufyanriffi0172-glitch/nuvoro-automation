@@ -1,10 +1,3 @@
-// Eén centraal aansluitpunt voor de later te bevestigen intake- en bookingprovider.
-// Activeer booking pas wanneer beide URLs betrouwbaar zijn ingericht.
-const NUVORO_CONFIG = Object.freeze({
-  intakeEndpoint: "",
-  bookingUrl: ""
-});
-
 document.documentElement.classList.add("js");
 
 const menuButton = document.querySelector(".menu-toggle");
@@ -101,13 +94,7 @@ if (processScanForm) {
   const progressItems = [...document.querySelectorAll(".scan-progress li")];
   const counter = document.querySelector("[data-step-counter]");
   const progressFill = document.querySelector("[data-progress-fill]");
-  const bookingButton = processScanForm.querySelector("[data-booking-button]");
-  const bookingStatus = processScanForm.querySelector("[data-booking-status]");
   let currentStep = 1;
-
-  const bookingReady = Boolean(NUVORO_CONFIG.intakeEndpoint && NUVORO_CONFIG.bookingUrl);
-  bookingButton.disabled = !bookingReady;
-  if (bookingReady) bookingStatus.textContent = "Na verzending ga je direct door naar de beschikbare afspraakmomenten.";
 
   const setStep = (step) => {
     currentStep = Math.min(Math.max(step, 1), panels.length);
@@ -182,26 +169,6 @@ if (processScanForm) {
   });
   processScanForm.querySelectorAll("[data-scan-back]").forEach((button) => button.addEventListener("click", () => setStep(currentStep - 1)));
 
-  processScanForm.addEventListener("submit", async (event) => {
-    event.preventDefault();
-    if (!bookingReady) return;
-
-    bookingButton.disabled = true;
-    bookingStatus.textContent = "Je Process Snapshot wordt veilig klaargezet voor de afspraak…";
-    try {
-      const response = await fetch(NUVORO_CONFIG.intakeEndpoint, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(getScanData())
-      });
-      if (!response.ok) throw new Error("Intake kon niet worden opgeslagen.");
-      const result = await response.json().catch(() => ({}));
-      window.location.assign(result.bookingUrl || NUVORO_CONFIG.bookingUrl);
-    } catch (error) {
-      bookingStatus.textContent = "Verzenden is niet gelukt. Je invoer staat nog op deze pagina; probeer het later opnieuw.";
-      bookingButton.disabled = false;
-    }
-  });
 }
 
 
@@ -227,7 +194,8 @@ if (processScanForm) {
     window.Cal('init', 'nuvoro', { origin: 'https://app.cal.com' });
     setTimeout(() => resolve(window.Cal.ns.nuvoro), 0);
   });
-  form.addEventListener('submit', async () => {
+  form.addEventListener('submit', async (event) => {
+    event.preventDefault();
     const data = new FormData(form);
     const scanId = crypto.randomUUID ? crypto.randomUUID() : String(Date.now());
     const intake = { name: data.get('name'), company: data.get('company'), email: data.get('email'), phone: data.get('phone'), problem: data.get('problem'), currentProcess: data.get('currentProcess'), hoursPerWeek: data.get('hoursPerWeek'), category: data.get('category'), painPoints: data.getAll('painPoints'), systems: data.get('systems'), scanId, website: '' };
