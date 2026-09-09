@@ -81,6 +81,7 @@ h1 span, h2 span { color: var(--color-accent); }
 .hero { padding-block: var(--space-6) var(--space-7); }
 .hero-grid { position: absolute; inset: 0; z-index: -1; opacity: .45; background-image: linear-gradient(rgba(94, 127, 166, .08) 1px, transparent 1px), linear-gradient(90deg, rgba(94, 127, 166, .08) 1px, transparent 1px); background-size: 48px 48px; mask-image: linear-gradient(to bottom, #000, transparent 86%); }
 .hero-content { display: grid; grid-template-columns: minmax(0, 1.18fr) minmax(28rem, .82fr); gap: clamp(2rem, 3.5vw, 3rem); align-items: center; }
+.hero-copy { min-width: 0; }
 .hero h1 { font-size: clamp(3rem, 3.7vw, 3.75rem); line-height: 1.08; }
 .hero-line { display: block; white-space: nowrap; }
 .hero h1 .hero-line-primary { color: var(--color-text); }
@@ -377,6 +378,10 @@ input:focus, textarea:focus { outline: 0; border-color: var(--color-accent); box
 @media (max-width: 1024px) {
   .capability-system { grid-template-columns: minmax(10rem, .8fr) 32px minmax(14rem, 1.2fr) 32px minmax(13rem, 1fr); padding: var(--space-3); }
   .philosophy-layout { gap: var(--space-5); }
+}
+
+@media (min-width: 1150px) {
+  .section-recognition h2 { white-space: nowrap; font-size: clamp(2.35rem, 3.2vw, 3rem); }
 }
 
 @media (max-width: 800px) {
