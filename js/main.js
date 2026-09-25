@@ -1,213 +1,120 @@
-document.documentElement.classList.add("js");
+document.documentElement.classList.add('js');
 
-const menuButton = document.querySelector(".menu-toggle");
-const siteHeader = document.querySelector(".site-header");
-const navigation = document.querySelector("#main-navigation");
-
+const menuButton = document.querySelector('.menu-toggle');
+const siteHeader = document.querySelector('.site-header');
+const navigation = document.querySelector('#main-navigation');
 if (menuButton && siteHeader && navigation) {
   const setMenuOpen = (open, restoreFocus = false) => {
-    siteHeader.classList.toggle("menu-open", open);
-    menuButton.setAttribute("aria-expanded", String(open));
-    menuButton.textContent = open ? "Sluiten" : "Menu";
+    siteHeader.classList.toggle('menu-open', open);
+    menuButton.setAttribute('aria-expanded', String(open));
+    menuButton.textContent = open ? 'Sluiten' : 'Menu';
     if (restoreFocus) menuButton.focus();
   };
-
-  menuButton.addEventListener("click", () => setMenuOpen(menuButton.getAttribute("aria-expanded") !== "true"));
-  navigation.querySelectorAll("a").forEach((link) => link.addEventListener("click", () => setMenuOpen(false)));
-  document.addEventListener("keydown", (event) => {
-    if (event.key === "Escape" && menuButton.getAttribute("aria-expanded") === "true") setMenuOpen(false, true);
+  menuButton.addEventListener('click', () => setMenuOpen(menuButton.getAttribute('aria-expanded') !== 'true'));
+  navigation.querySelectorAll('a').forEach((link) => link.addEventListener('click', () => setMenuOpen(false)));
+  document.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && menuButton.getAttribute('aria-expanded') === 'true') setMenuOpen(false, true);
   });
-  siteHeader.addEventListener("focusout", (event) => {
+  siteHeader.addEventListener('focusout', (event) => {
     if (!siteHeader.contains(event.relatedTarget)) setMenuOpen(false);
   });
-  document.addEventListener("click", (event) => {
+  document.addEventListener('click', (event) => {
     if (!siteHeader.contains(event.target)) setMenuOpen(false);
   });
-  window.matchMedia("(min-width: 801px)").addEventListener("change", (event) => {
+  window.matchMedia('(min-width: 801px)').addEventListener('change', (event) => {
     if (event.matches) setMenuOpen(false);
   });
 }
 
-document.querySelectorAll("[data-current-year]").forEach((element) => {
+document.querySelectorAll('[data-current-year]').forEach((element) => {
   element.textContent = new Date().getFullYear();
 });
 
-const revealItems = document.querySelectorAll("[data-reveal]");
-if ("IntersectionObserver" in window && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
-  const revealObserver = new IntersectionObserver((entries, observer) => {
-    entries.forEach((entry) => {
-      if (!entry.isIntersecting) return;
-      entry.target.classList.add("is-visible");
-      observer.unobserve(entry.target);
-    });
-  }, { rootMargin: "0px 0px -8%", threshold: 0.08 });
-  revealItems.forEach((item) => revealObserver.observe(item));
-} else {
-  revealItems.forEach((item) => item.classList.add("is-visible"));
-}
-
-const livingProcess = document.querySelector("[data-living-process]");
+const livingProcess = document.querySelector('[data-living-process]');
 if (livingProcess) {
-  const stateButtons = livingProcess.querySelectorAll("[data-process-state]");
-  const statePanels = livingProcess.querySelectorAll("[data-state-panel]");
-  stateButtons.forEach((button) => {
-    button.addEventListener("click", () => {
-      const targetState = button.dataset.processState;
-      stateButtons.forEach((item) => item.setAttribute("aria-pressed", String(item === button)));
-      statePanels.forEach((panel) => { panel.hidden = panel.dataset.statePanel !== targetState; });
-    });
-  });
+  const buttons = livingProcess.querySelectorAll('[data-process-state]');
+  const panels = livingProcess.querySelectorAll('[data-state-panel]');
+  buttons.forEach((button) => button.addEventListener('click', () => {
+    buttons.forEach((item) => item.setAttribute('aria-pressed', String(item === button)));
+    panels.forEach((panel) => { panel.hidden = panel.dataset.statePanel !== button.dataset.processState; });
+  }));
 }
 
-const validationMessage = (field) => {
-  if (field.validity.typeMismatch) return "Vul een geldig zakelijk e-mailadres in.";
-  if (field.validity.rangeUnderflow || field.validity.badInput) return "Vul een positief aantal uren in.";
-  return "Vul dit veld in.";
-};
-
-const showFieldValidation = (field) => {
-  const error = document.getElementById(`${field.id}-error`);
-  const invalid = !field.validity.valid;
-  field.setAttribute("aria-invalid", String(invalid));
-  if (error) {
-    error.textContent = invalid ? validationMessage(field) : "";
-    error.hidden = !invalid;
-  }
-  return !invalid;
-};
-
-const contactForm = document.querySelector("#contact-form");
-if (contactForm) {
-  contactForm.addEventListener("submit", (event) => event.preventDefault());
-  contactForm.querySelectorAll("[required]").forEach((field) => {
-    field.addEventListener("blur", () => showFieldValidation(field));
-    field.addEventListener("invalid", () => showFieldValidation(field));
-    field.addEventListener("input", () => {
-      if (field.getAttribute("aria-invalid") === "true") showFieldValidation(field);
-    });
-  });
-}
-
-const processScanForm = document.querySelector("#process-scan-form");
-if (processScanForm) {
-  const panels = [...processScanForm.querySelectorAll("[data-scan-step]")];
-  const progressItems = [...document.querySelectorAll(".scan-progress li")];
-  const counter = document.querySelector("[data-step-counter]");
-  const progressFill = document.querySelector("[data-progress-fill]");
-  let currentStep = 1;
-
-  const setStep = (step) => {
-    currentStep = Math.min(Math.max(step, 1), panels.length);
-    panels.forEach((panel) => { panel.hidden = Number(panel.dataset.scanStep) !== currentStep; });
-    progressItems.forEach((item, index) => {
-      if (index + 1 === currentStep) item.setAttribute("aria-current", "step");
-      else item.removeAttribute("aria-current");
-      item.classList.toggle("is-complete", index + 1 < currentStep);
-    });
-    counter.textContent = `${String(currentStep).padStart(2, "0")} / ${String(panels.length).padStart(2, "0")}`;
-    progressFill.style.width = `${(currentStep / panels.length) * 100}%`;
-    const heading = panels[currentStep - 1].querySelector("h2");
-    heading.setAttribute("tabindex", "-1");
-    heading.focus({ preventScroll: true });
-    document.querySelector(".scan-workspace").scrollIntoView({ behavior: "smooth", block: "start" });
-  };
-
-  const validatePanel = (panel) => {
-    const requiredFields = [...panel.querySelectorAll("[required]")];
-    const valid = requiredFields.map(showFieldValidation).every(Boolean);
-    if (!valid) requiredFields.find((field) => !field.validity.valid)?.focus();
-    return valid;
-  };
-
-  const getScanData = () => {
-    const data = new FormData(processScanForm);
-    return {
-      name: String(data.get("name") || "").trim(),
-      company: String(data.get("company") || "").trim(),
-      email: String(data.get("email") || "").trim(),
-      phone: String(data.get("phone") || "").trim(),
-      problem: String(data.get("problem") || "").trim(),
-      currentProcess: String(data.get("currentProcess") || "").trim(),
-      hoursPerWeek: String(data.get("hoursPerWeek") || "").trim(),
-      category: String(data.get("category") || "Niet opgegeven"),
-      painPoints: data.getAll("painPoints").map(String),
-      systems: String(data.get("systems") || "").trim()
-    };
-  };
-
-  const renderSummary = () => {
-    const data = getScanData();
-    const summary = {
-      problem: data.problem,
-      currentProcess: data.currentProcess,
-      hoursPerWeek: data.hoursPerWeek,
-      category: data.category,
-      painPoints: data.painPoints.length ? data.painPoints.join(" · ") : "Niet opgegeven",
-      systems: data.systems || "Niet opgegeven",
-      contact: `${data.name} · ${data.company}\n${data.email}${data.phone ? ` · ${data.phone}` : ""}`
-    };
-    Object.entries(summary).forEach(([key, value]) => {
-      const target = processScanForm.querySelector(`[data-summary="${key}"]`);
-      if (target) target.textContent = value;
-    });
-  };
-
-  processScanForm.querySelectorAll("[required]").forEach((field) => {
-    field.addEventListener("blur", () => showFieldValidation(field));
-    field.addEventListener("input", () => {
-      if (field.getAttribute("aria-invalid") === "true") showFieldValidation(field);
-    });
-  });
-
-  processScanForm.querySelectorAll("[data-scan-next]").forEach((button) => {
-    button.addEventListener("click", () => {
-      const panel = panels[currentStep - 1];
-      if (!validatePanel(panel)) return;
-      if (currentStep === 3) renderSummary();
-      setStep(currentStep + 1);
-    });
-  });
-  processScanForm.querySelectorAll("[data-scan-back]").forEach((button) => button.addEventListener("click", () => setStep(currentStep - 1)));
-
-}
-
-
-// Process Scan: n8n-intake gevolgd door een ingesloten Cal.com-afspraakplanner.
-(() => {
-  const form = document.querySelector('#process-scan-form');
-  if (!form) return;
+const form = document.querySelector('#process-scan-form');
+if (form) {
   const endpoint = 'https://soufyanriffi.app.n8n.cloud/webhook/nuvoro-process-scan';
   const calLink = 'soufyan-riffi-ptzlxn/procesgesprek';
   const button = form.querySelector('[data-booking-button]');
   const status = form.querySelector('[data-booking-status]');
-  button.disabled = false;
-  status.textContent = 'Na verzending ga je direct door naar de beschikbare afspraakmomenten.';
-  const loadCal = () => new Promise((resolve) => {
-    if (!window.Cal) {
-      window.Cal = window.Cal || function () {
-        const c = window.Cal; const a = arguments;
-        if (!c.loaded) { c.ns = {}; c.q = c.q || []; document.head.appendChild(document.createElement('script')).src = 'https://app.cal.com/embed/embed.js'; c.loaded = true; }
-        if (a[0] === 'init') { const n = a[1]; const api = function () { api.q.push(arguments); }; api.q = []; c.ns[n] = c.ns[n] || api; c.ns[n].q.push(a); c.q.push(['initNamespace', n]); return; }
-        c.q.push(a);
-      };
+  const booking = form.querySelector('#cal-booking');
+  const fallback = form.querySelector('#cal-fallback');
+  const required = [...form.querySelectorAll('[required]')];
+  let sent = false;
+
+  const validate = (field) => {
+    const invalid = !field.validity.valid || !field.value.trim();
+    const error = document.getElementById(`${field.id}-error`);
+    field.setAttribute('aria-invalid', String(invalid));
+    if (error) {
+      error.textContent = invalid ? (field.validity.typeMismatch ? 'Vul een geldig e-mailadres in.' : 'Vul dit veld in.') : '';
+      error.hidden = !invalid;
     }
-    window.Cal('init', 'nuvoro', { origin: 'https://app.cal.com' });
-    setTimeout(() => resolve(window.Cal.ns.nuvoro), 0);
+    return !invalid;
+  };
+  required.forEach((field) => {
+    field.addEventListener('blur', () => validate(field));
+    field.addEventListener('input', () => {
+      if (field.getAttribute('aria-invalid') === 'true') validate(field);
+    });
   });
+
+  const loadCal = () => new Promise((resolve, reject) => {
+    if (window.Cal) { resolve(window.Cal); return; }
+    const script = document.createElement('script');
+    script.src = 'https://app.cal.com/embed/embed.js';
+    script.onload = () => resolve(window.Cal);
+    script.onerror = () => reject(new Error('cal'));
+    document.head.append(script);
+  });
+
   form.addEventListener('submit', async (event) => {
     event.preventDefault();
+    if (sent) return;
+    const valid = required.map(validate).every(Boolean);
+    if (!valid) { required.find((field) => field.getAttribute('aria-invalid') === 'true')?.focus(); return; }
     const data = new FormData(form);
+    const intake = Object.fromEntries(data.entries());
     const scanId = crypto.randomUUID ? crypto.randomUUID() : String(Date.now());
-    const intake = { name: data.get('name'), company: data.get('company'), email: data.get('email'), phone: data.get('phone'), problem: data.get('problem'), currentProcess: data.get('currentProcess'), hoursPerWeek: data.get('hoursPerWeek'), category: data.get('category'), painPoints: data.getAll('painPoints'), systems: data.get('systems'), scanId, website: '' };
-    button.disabled = true; status.textContent = 'Je Process Snapshot wordt veilig klaargezet voor de afspraak…';
+    // Preserve the existing n8n field names where they still describe Module 1 answers.
+    const payload = { name: intake.name, company: intake.company, email: intake.email, phone: intake.phone || '', problem: intake.reason, currentProcess: intake.process, expectation: intake.expectation, role: intake.role, hoursPerWeek: '', category: '', painPoints: [], systems: '', scanId, website: '' };
+    button.disabled = true;
+    status.textContent = 'Je voorbereiding wordt verzonden…';
     try {
-      const response = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(intake) });
+      const response = await fetch(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload) });
       if (!response.ok) throw new Error('intake');
-      let panel = document.querySelector('#cal-booking');
-      if (!panel) { panel = document.createElement('div'); panel.id = 'cal-booking'; panel.style.cssText = 'min-height:36rem;margin-top:1.5rem;border:1px solid #d5dfed;border-radius:14px;overflow:hidden;background:#fff'; form.querySelector('.booking-panel').after(panel); }
-      button.hidden = true; status.textContent = 'Kies hieronder een moment voor je procesgesprek.';
+      sent = true;
+      button.hidden = true;
+      status.textContent = 'Verzonden. De afspraakplanner wordt geladen…';
+    } catch {
+      button.disabled = false;
+      status.textContent = 'Verzenden is niet gelukt. Je invoer blijft op deze pagina; probeer het opnieuw.';
+      return;
+    }
+    try {
       const Cal = await loadCal();
-      Cal('inline', { elementOrSelector: '#cal-booking', calLink, config: { name: intake.name, email: intake.email, 'metadata[scanId]': scanId, 'metadata[company]': intake.company || '', 'metadata[phone]': intake.phone || '', 'metadata[problem]': String(intake.problem || '').slice(0, 480), 'metadata[currentProcess]': String(intake.currentProcess || '').slice(0, 480), 'metadata[hoursPerWeek]': intake.hoursPerWeek || '', 'metadata[category]': intake.category || '', 'metadata[painPoints]': intake.painPoints.join(' · '), 'metadata[systems]': intake.systems || '' } });
-    } catch { button.disabled = false; status.textContent = 'Verzenden is niet gelukt. Je invoer blijft op deze pagina; probeer het later opnieuw.'; }
+      if (typeof Cal !== 'function') throw new Error('cal');
+      Cal('init', 'nuvoro', { origin: 'https://app.cal.com' });
+      booking.hidden = false;
+      Cal.ns.nuvoro('inline', { elementOrSelector: '#cal-booking', calLink, config: {
+        name: payload.name, email: payload.email,
+        'metadata[scanId]': scanId, 'metadata[company]': payload.company,
+        'metadata[phone]': payload.phone, 'metadata[process]': payload.currentProcess.slice(0, 480)
+      } });
+      status.textContent = 'Kies hieronder een moment voor je procesgesprek.';
+    } catch {
+      booking.hidden = true;
+      fallback.hidden = false;
+      status.textContent = 'Je voorbereiding is ontvangen. De ingesloten afspraakplanner kon niet laden; open de planner via de link hieronder.';
+    }
   });
-})();
+}
