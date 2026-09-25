@@ -56,7 +56,7 @@ if (lens) {
   });
 }
 
-const form = document.querySelector('#process-scan-form');
+const form = document.querySelector('#process-intake-form');
 if (form) {
   const endpoint = 'https://soufyanriffi.app.n8n.cloud/webhook/nuvoro-process-scan';
   const calLink = 'soufyan-riffi-ptzlxn/procesgesprek';
@@ -101,7 +101,7 @@ if (form) {
     const data = new FormData(form);
     const intake = Object.fromEntries(data.entries());
     const scanId = crypto.randomUUID ? crypto.randomUUID() : String(Date.now());
-    // Preserve the existing n8n field names where they still describe Module 1 answers.
+    // Preserve the existing n8n field names for the process conversation endpoint.
     const payload = { name: intake.name, company: intake.company, email: intake.email, phone: intake.phone || '', problem: intake.reason, currentProcess: intake.process, expectation: intake.expectation, role: intake.role, hoursPerWeek: '', category: '', painPoints: [], systems: '', scanId, website: '' };
     button.disabled = true;
     status.textContent = 'Je voorbereiding wordt verzonden…';
