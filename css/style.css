@@ -390,9 +390,9 @@ body { background: #f7fafe; }
 
 .offers-section { background: #fff; }
 .offers-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
-.offer-card { display: flex; flex-direction: column; min-width: 0; min-height: 380px; padding: clamp(2rem, 3.7vw, 3.25rem); border: 1px solid #bfd3e4; }
+.offer-card { display: flex; flex-direction: column; min-width: 0; min-height: 440px; padding: clamp(2rem, 3.7vw, 3.25rem); border: 1px solid #bfd3e4; }
 .offer-card h3 { max-width: 15ch; margin: 2.6rem 0 1.25rem; font-size: clamp(2rem, 3.25vw, 3.15rem); line-height: 1.1; }
-.offer-card p { max-width: 38ch; margin: 0; font-size: 1rem; line-height: 1.6; }
+.offer-card p { max-width: 38ch; margin: 0 0 2.25rem; font-size: 1rem; line-height: 1.6; }
 .offer-card__bottom { display: flex; justify-content: space-between; align-items: end; gap: 1.5rem; margin-top: auto; padding-top: 2rem; border-top: 1px solid currentColor; font-size: .83rem; }
 .offer-card__bottom strong { display: block; font-size: 1.5rem; line-height: 1.1; }
 .offer-card__bottom a { font-weight: 720; text-decoration: none; white-space: nowrap; }
@@ -431,7 +431,7 @@ body { background: #f7fafe; }
   .service-card h3 { margin-top: 1.75rem; }
   .service-card p { max-width: 54ch; }
   .offers-grid { grid-template-columns: 1fr; }
-  .offer-card { min-height: 330px; }
+  .offer-card { min-height: 350px; }
   .process-lens__stage { grid-template-columns: 1fr .95fr; }
   .lens-panel dl div { grid-template-columns: 1fr; gap: .3rem; }
 }
@@ -446,7 +446,7 @@ body { background: #f7fafe; }
   .process-lens__visual { min-height: 180px; padding: 3rem .6rem; }
   .process-lens__node { min-height: 48px; font-size: .46rem; }
   .process-lens__content { min-height: 315px; }
-  .offer-card { min-height: 360px; padding: 1.75rem; }
+  .offer-card { min-height: 380px; padding: 1.75rem; }
   .offer-card h3 { margin-top: 2rem; }
   .offer-card__bottom { align-items: start; flex-direction: column; gap: .75rem; }
   .route-line > div, .route-line > div + div { padding: 1.5rem 0; }
