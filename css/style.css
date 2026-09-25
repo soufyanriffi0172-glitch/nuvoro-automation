@@ -416,3 +416,5 @@ input:focus, textarea:focus { outline: 0; border-color: var(--color-accent); box
   .scan-intro { padding-block: var(--space-5); }
   .process-scan-journey li { grid-template-columns: 2rem 1fr; gap: .75rem; }
 }
+
+.button[hidden], .text-link[hidden] { display: none; }
