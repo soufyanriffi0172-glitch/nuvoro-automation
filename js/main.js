@@ -7,7 +7,8 @@ if (menuButton && siteHeader && navigation) {
   const setMenuOpen = (open, restoreFocus = false) => {
     siteHeader.classList.toggle('menu-open', open);
     menuButton.setAttribute('aria-expanded', String(open));
-    menuButton.textContent = open ? 'Sluiten' : 'Menu';
+    menuButton.firstChild.textContent = open ? 'Sluiten ' : 'Menu ';
+    menuButton.querySelector('span').textContent = open ? '×' : '☰';
     if (restoreFocus) menuButton.focus();
   };
   menuButton.addEventListener('click', () => setMenuOpen(menuButton.getAttribute('aria-expanded') !== 'true'));
@@ -21,7 +22,7 @@ if (menuButton && siteHeader && navigation) {
   document.addEventListener('click', (event) => {
     if (!siteHeader.contains(event.target)) setMenuOpen(false);
   });
-  window.matchMedia('(min-width: 801px)').addEventListener('change', (event) => {
+  window.matchMedia('(min-width: 851px)').addEventListener('change', (event) => {
     if (event.matches) setMenuOpen(false);
   });
 }
@@ -30,14 +31,29 @@ document.querySelectorAll('[data-current-year]').forEach((element) => {
   element.textContent = new Date().getFullYear();
 });
 
-const livingProcess = document.querySelector('[data-living-process]');
-if (livingProcess) {
-  const buttons = livingProcess.querySelectorAll('[data-process-state]');
-  const panels = livingProcess.querySelectorAll('[data-state-panel]');
-  buttons.forEach((button) => button.addEventListener('click', () => {
-    buttons.forEach((item) => item.setAttribute('aria-pressed', String(item === button)));
-    panels.forEach((panel) => { panel.hidden = panel.dataset.statePanel !== button.dataset.processState; });
-  }));
+const lens = document.querySelector('[data-process-lens]');
+if (lens) {
+  const tabs = [...lens.querySelectorAll('[data-lens]')];
+  const panels = [...lens.querySelectorAll('[data-lens-panel]')];
+  const selectTab = (tab, focus = false) => {
+    lens.dataset.active = tab.dataset.lens;
+    tabs.forEach((item) => {
+      const selected = item === tab;
+      item.setAttribute('aria-selected', String(selected));
+      item.tabIndex = selected ? 0 : -1;
+    });
+    panels.forEach((panel) => { panel.hidden = panel.dataset.lensPanel !== tab.dataset.lens; });
+    if (focus) tab.focus();
+  };
+  tabs.forEach((tab, index) => {
+    tab.addEventListener('click', () => selectTab(tab));
+    tab.addEventListener('keydown', (event) => {
+      const next = { ArrowRight: (index + 1) % tabs.length, ArrowLeft: (index - 1 + tabs.length) % tabs.length, Home: 0, End: tabs.length - 1 }[event.key];
+      if (next === undefined) return;
+      event.preventDefault();
+      selectTab(tabs[next], true);
+    });
+  });
 }
 
 const form = document.querySelector('#process-scan-form');
